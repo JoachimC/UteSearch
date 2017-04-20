@@ -5,7 +5,10 @@ open System
 open canopy
 open OpenQA.Selenium
 
-type result = 
+open Chiron
+open Chiron.Operators
+
+type Result = 
     {
         recordId :String option; 
         price :Decimal option; 
@@ -15,6 +18,17 @@ type result =
         url :String option;
         scraped : DateTimeOffset
     }
+
+    static member ToJson (x:Result) =
+        json { 
+            do! Json.write "recordId" x.recordId
+            do! Json.write "distanceKm" x.distance
+            do! Json.write "priceAUD" x.price
+            do! Json.write "year" x.year
+            do! Json.write "transmission" x.transmission
+            do! Json.write "url" x.url
+            do! Json.write "scraped" x.scraped
+        }
 
 let tryParseDecimal (decimalStr :String) = 
    try
