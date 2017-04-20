@@ -5,7 +5,16 @@ open System
 open canopy
 open OpenQA.Selenium
 
-type result = {recordId :String option; price :Decimal option; distance :Decimal option; year :Decimal option; transmission :String option; url :String option }
+type result = 
+    {
+        recordId :String option; 
+        price :Decimal option; 
+        distance :Decimal option; 
+        year :Decimal option; 
+        transmission :String option; 
+        url :String option;
+        scraped : DateTimeOffset
+    }
 
 let tryParseDecimal (decimalStr :String) = 
    try
@@ -60,7 +69,8 @@ let parseSearchResult (result: IWebElement) =
         distance = distance; 
         year = year; 
         transmission = transmission; 
-        url = url
+        url = url;
+        scraped = DateTimeOffset.Now
     }
 
 let href (element: IWebElement) = element |> someElementWithin "a" |> Option.map (fun a -> a.GetAttribute("href"))
