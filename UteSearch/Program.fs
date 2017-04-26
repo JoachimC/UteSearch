@@ -11,9 +11,10 @@ let writeResult dataDir (result :Scraper.Result) =
     match fileName with 
     | Some f ->         
             let file = System.IO.Path.Combine(dataDir.ToString(), f)
-            let json = Json.serialize result
-            let content = Json.formatWith JsonFormattingOptions.Pretty json
-            System.IO.File.WriteAllText(file.ToString(), content)
+            if (not (System.IO.FileInfo(file)).Exists) then 
+                let json = Json.serialize result
+                let content = Json.formatWith JsonFormattingOptions.Pretty json
+                System.IO.File.WriteAllText(file.ToString(), content)
     | None -> ()
     
 [<EntryPoint>]
