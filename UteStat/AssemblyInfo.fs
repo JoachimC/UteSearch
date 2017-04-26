@@ -1,4 +1,4 @@
-﻿namespace UteSearch.AssemblyInfo
+﻿namespace UteStat.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -7,11 +7,11 @@ open System.Runtime.InteropServices
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("UteSearch")>]
+[<assembly: AssemblyTitle("UteStat")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
-[<assembly: AssemblyProduct("UteSearch")>]
+[<assembly: AssemblyProduct("UteStat")>]
 [<assembly: AssemblyCopyright("Copyright © Joachim Chapman 2017")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
@@ -22,7 +22,7 @@ open System.Runtime.InteropServices
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("cdd9c5f3-a2cd-4390-b139-0b3664487942")>]
+[<assembly: Guid("652511d0-b04d-4618-8492-77ac2ae06084")>]
 
 // Version information for an assembly consists of the following four values:
 // 
