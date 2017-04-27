@@ -8,8 +8,11 @@ open OpenQA.Selenium
 open Chiron
 open Chiron.Operators
 
+type Search = { name :string; startPageUrl :string }
+
 type Result = 
     {
+        name :String;
         recordId :String option; 
         price :Decimal option; 
         distance :Decimal option; 
@@ -21,6 +24,7 @@ type Result =
 
     static member ToJson (x:Result) =
         json { 
+            do! Json.write "name" x.name
             do! Json.write "recordId" x.recordId
             do! Json.write "distanceKm" x.distance
             do! Json.write "priceAUD" x.price
@@ -67,7 +71,7 @@ let parseTransmission (result: IWebElement) =
     |> Option.map (fun x -> x.Trim())
 
 
-let parseSearchResult (result: IWebElement) =
+let parseSearchResult name (result: IWebElement) =
     let header = (result |> someElementWithin "div h2 a")    
     let url = header |> Option.map (fun h -> h.GetAttribute("href")) 
     let recordId = header |> Option.map (fun h -> h.GetAttribute("recordid"))
@@ -78,6 +82,7 @@ let parseSearchResult (result: IWebElement) =
     let transmission = result |> parseTransmission
     
     {
+        name = name;
         recordId = recordId; 
         price = price; 
         distance = distance; 
@@ -94,19 +99,20 @@ let isValidNextLink (element: IWebElement) =
         |None -> false
         |Some url -> not (url.Contains("javascript"))
 
-let rec parseSearchPage searchPage = 
-    url searchPage
+let rec parseSearchPage (search :Search) = 
+    url search.startPageUrl
 
+    let parseNamedSearchResult = parseSearchResult search.name
     let thisPageResults = 
         elements "div.result-item"
-        |> List.map parseSearchResult
+        |> List.map parseNamedSearchResult
 
     let otherPageResults = 
         elements "li.next"
         |> List.filter isValidNextLink
         |> List.choose href
         |> List.distinct
-        |> List.map parseSearchPage
+        |> List.map (fun result -> parseSearchPage {search with startPageUrl = result})
         |> List.concat
 
     List.append thisPageResults otherPageResults
