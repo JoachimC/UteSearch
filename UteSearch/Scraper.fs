@@ -5,38 +5,17 @@ open System
 open canopy
 open OpenQA.Selenium
 
-open Chiron
-open Chiron.Operators
-
 type Search = { name :string; startPageUrl :string }
-
-type Result = 
-    {
-        name :String;
-        recordId :String option; 
-        price :Decimal option; 
-        distance :Decimal option; 
-        year :Decimal option; 
-        transmission :String option; 
-        url :String option;
-        scraped : DateTimeOffset
-    }
-
-    static member ToJson (x:Result) =
-        json { 
-            do! Json.write "name" x.name
-            do! Json.write "recordId" x.recordId
-            do! Json.write "distanceKm" x.distance
-            do! Json.write "priceAUD" x.price
-            do! Json.write "year" x.year
-            do! Json.write "transmission" x.transmission
-            do! Json.write "url" x.url
-            do! Json.write "scraped" x.scraped
-        }
 
 let tryParseDecimal (decimalStr :String) = 
    try
       let i = System.Decimal.Parse decimalStr
+      Some i
+   with _ -> None
+
+let tryParseInt (intStr :String) = 
+   try
+      let i = System.Int32.Parse intStr
       Some i
    with _ -> None
 
@@ -58,11 +37,11 @@ let parseDistance (result: IWebElement) :Decimal option=
     |> Option.map tryParseDecimal
     |> Option.flatten
 
-let parseYear (description :String option) :Decimal option = 
+let parseYear (description :String option) :int option = 
     description
     |> Option.map (fun d -> RegExExtensions.namedGroup "^(?<year>(\d*))\s" "year" d)
     |> Option.flatten
-    |> Option.map tryParseDecimal
+    |> Option.map tryParseInt
     |> Option.flatten
 
 let parseTransmission (result: IWebElement) = 
@@ -71,7 +50,7 @@ let parseTransmission (result: IWebElement) =
     |> Option.map (fun x -> x.Trim())
 
 
-let parseSearchResult name (result: IWebElement) =
+let parseSearchResult name (result: IWebElement) : Scraper.Model.Result =
     let header = (result |> someElementWithin "div h2 a")    
     let url = header |> Option.map (fun h -> h.GetAttribute("href")) 
     let recordId = header |> Option.map (fun h -> h.GetAttribute("recordid"))
@@ -84,8 +63,8 @@ let parseSearchResult name (result: IWebElement) =
     {
         name = name;
         recordId = recordId; 
-        price = price; 
-        distance = distance; 
+        priceAUD = price; 
+        distanceKm = distance; 
         year = year; 
         transmission = transmission; 
         url = url;
@@ -99,7 +78,7 @@ let isValidNextLink (element: IWebElement) =
         |None -> false
         |Some url -> not (url.Contains("javascript"))
 
-let rec parseSearchPage (onResult :Result -> unit) (search :Search)  = 
+let rec parseSearchPage (onResult : Scraper.Model.Result -> unit) (search :Search)  = 
     url search.startPageUrl
 
     let parseNamedSearchResult = parseSearchResult search.name    
