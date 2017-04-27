@@ -21,13 +21,11 @@ let writeResult dataDir (result :Scraper.Result) =
                 System.IO.File.WriteAllText(file.ToString(), content)
     | None -> ()
 
-let search dataDir search = 
+let search onResult search = 
     start chrome
 
-    let writeResultToDir = writeResult dataDir
     try
-        Scraper.parseSearchPage search
-        |> List.iter writeResultToDir
+        Scraper.parseSearchPage onResult search
 
     finally
         quit()
@@ -44,10 +42,11 @@ let main argv =
             System.IO.Path.GetTempPath()
 
     let dataDir = System.IO.DirectoryInfo(dataPath)
-    let searchToDataDir = search dataDir
+    let writeResultToDir = writeResult dataDir
+    let searchAndWriteToDir = search writeResultToDir
 
     searches
-    |> Array.iter searchToDataDir 
+    |> Array.iter searchAndWriteToDir
     
     0
 

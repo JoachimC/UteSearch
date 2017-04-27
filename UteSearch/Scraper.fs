@@ -99,20 +99,19 @@ let isValidNextLink (element: IWebElement) =
         |None -> false
         |Some url -> not (url.Contains("javascript"))
 
-let rec parseSearchPage (search :Search) = 
+let rec parseSearchPage (onResult :Result -> unit) (search :Search)  = 
     url search.startPageUrl
 
-    let parseNamedSearchResult = parseSearchResult search.name
-    let thisPageResults = 
-        elements "div.result-item"
-        |> List.map parseNamedSearchResult
+    let parseNamedSearchResult = parseSearchResult search.name    
+    elements "div.result-item"
+    |> List.map parseNamedSearchResult
+    |> List.iter onResult
 
-    let otherPageResults = 
-        elements "li.next"
-        |> List.filter isValidNextLink
-        |> List.choose href
-        |> List.distinct
-        |> List.map (fun result -> parseSearchPage {search with startPageUrl = result})
-        |> List.concat
+    
+    elements "li.next"
+    |> List.filter isValidNextLink
+    |> List.choose href
+    |> List.distinct
+    |> List.iter (fun result -> parseSearchPage onResult {search with startPageUrl = result})
 
-    List.append thisPageResults otherPageResults
+    ()
