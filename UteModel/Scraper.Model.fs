@@ -27,7 +27,7 @@ type Result =
     }
 
     static member FromJson (_ :Result) = json {
-        let! name = Json.readOrDefault "name" "Amarok 4x4"
+        let! name = Json.read "name"
         let! recordId = Json.read "recordId"
         let! distanceKm = Json.read "distanceKm"
         let! priceAUD = Json.read "priceAUD"

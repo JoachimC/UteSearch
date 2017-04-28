@@ -82,7 +82,7 @@ let rec parseSearchPage (onResult : Scraper.Model.Result -> unit) (search :Searc
     url search.startPageUrl
 
     let parseNamedSearchResult = parseSearchResult search.name    
-    elements "div.result-item"
+    elements ".result-item"
     |> List.map parseNamedSearchResult
     |> List.iter onResult
 
