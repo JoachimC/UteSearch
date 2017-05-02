@@ -36,7 +36,7 @@ let main argv =
                 result.priceAUD |> foldDecimalToStringOrEmpty
                 result.distanceKm |> Option.map (fun distKm -> if (distKm < 100m) then distKm * 1000m else distKm) |> foldDecimalToStringOrEmpty 
                 result.year |> Option.fold (fun _ year -> (result.scraped.Year-year).ToString()) ""
-                result.scraped.Year.ToString()
+                result.year |> Option.fold (fun _ year -> year.ToString()) ""
                 result.transmission |> foldOrEmpty
                 result.url |> foldOrEmpty
             |] 
